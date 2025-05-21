@@ -73,7 +73,15 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
-    """配置Allure报告元数据"""
-    config._metadata["项目名称"] = "bookstack接口自动化测试"
-    config._metadata["测试范围"] = "核心业务接口"
-    config._metadata["维护团队"] = "质量保障部"
+    """安全配置Allure报告元数据"""
+    # 初始化metadata（兼容性处理）
+    if not hasattr(config, '_metadata'):
+        config._metadata = {}
+
+    # 添加项目元数据
+    metadata = {
+        "项目名称": "bookstack接口测试平台",
+        "测试范围": "核心业务接口",
+        "维护团队": "质量保障部"
+    }
+    config._metadata.update(metadata)
