@@ -6,11 +6,11 @@ from common.get_caseparams import DataLoader
 from common.assertion import Assertion
 
 
-@allure.feature("车主工具接口测试")
-class TestOwnerTools:
-    @allure.story("获取车主工具列表")
-    @pytest.mark.parametrize("case", DataLoader.load_yaml("getownertools.yaml"))
-    def test_get_tools(self, case):
+@allure.feature("bookstack接口测试")
+class TestLogin:
+    @allure.story("登录")
+    @pytest.mark.parametrize("case", DataLoader.load_yaml("login.yaml"))
+    def test_login(self, case):
         req = RequestHandler()
         test_data = case["test_data"]
 

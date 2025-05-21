@@ -74,6 +74,6 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     """配置Allure报告元数据"""
-    config._metadata["项目名称"] = "二手车接口测试平台"
+    config._metadata["项目名称"] = "bookstack接口自动化测试"
     config._metadata["测试范围"] = "核心业务接口"
     config._metadata["维护团队"] = "质量保障部"
