@@ -1,30 +1,37 @@
+# common/log.py
 import logging
+import sys
 from pathlib import Path
 from logging.handlers import TimedRotatingFileHandler
 
 
 class LogHandler:
     def __init__(self):
-        self.log_path = Path(__file__).parent.parent / 'log' / 'autotest.log'
+        self.logger = logging.getLogger("AutoTest")
+        self.logger.setLevel(logging.DEBUG)
+        self._setup_handlers()
 
-    def create_logger(self):
-        logger = logging.getLogger("AutoTest")
-        logger.setLevel(logging.INFO)
-
-        formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-        # 按天轮转日志
+    def _setup_handlers(self):
+        # 文件处理器
+        log_path = Path(__file__).parent.parent / 'log' / 'autotest.log'
         file_handler = TimedRotatingFileHandler(
-            filename=self.log_path,
-            when='D',
-            interval=1,
-            backupCount=7
+            filename=log_path,
+            when='midnight',
+            backupCount=7,
+            encoding='utf-8'
         )
-        file_handler.setFormatter(formatter)
+        file_formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
+        file_handler.setFormatter(file_formatter)
 
-        logger.addHandler(file_handler)
-        return logger
+        # 控制台处理器
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_formatter = logging.Formatter('%(levelname)s - %(message)s')
+        console_handler.setFormatter(console_formatter)
+
+        self.logger.addHandler(file_handler)
+        self.logger.addHandler(console_handler)
 
 
-logger = LogHandler().create_logger()
+logger = LogHandler().logger

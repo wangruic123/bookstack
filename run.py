@@ -1,13 +1,19 @@
+# run.py
 import pytest
 import os
+import shutil
 
-if __name__ == '__main__':
-    # 清理历史结果
-    os.system("rm -rf ./log/allure-results")
+def clear_history():
+    """清理历史数据"""
+    results_dir = "./log/allure-results"
+    report_dir = "./log/allure-report"
+    if os.path.exists(results_dir):
+        shutil.rmtree(results_dir)
+    if os.path.exists(report_dir):
+        shutil.rmtree(report_dir)
 
-    # 执行测试用例
-    pytest.main(["-s", "-v"])
-
-    # 生成Allure报告
+if __name__ == "__main__":
+    clear_history()
+    pytest.main(["-s", "-v", "--alluredir=./log/allure-results"])
     os.system("allure generate ./log/allure-results -o ./log/allure-report --clean")
     os.system("allure open ./log/allure-report")

@@ -1,12 +1,27 @@
-test_login:
-  - description: "用户登录成功"
+# getownertools.yaml
+- test_name: "正常场景-登录成功"
+  test_data:
     method: POST
-    url: /auth/login
+    url: /login
+    params:
+      token: "123"
+      email: "admin@admin.com"
+      password: "admin123456"
     headers:
-      Content-Type: application/json
-    data:
-      username: "admin"
-      password: "123456"
-    validate:
-      - eq: [status_code, 200]
-      - contains: [content, "token"]
+      Content-Type: application/x-www-form-urlencoded
+  expected:
+    status_code: 200
+    contains: "token"
+
+- test_name: "异常场景-无效Token"
+  test_data:
+    method: POST
+    url: /login
+    params:
+      email: "admin@admin.com"
+      password: "admin123456"
+    headers:
+      Content-Type: application/x-www-form-urlencoded
+  expected:
+    status_code: 401
+    contains: "Unauthorized"
