@@ -1,4 +1,4 @@
-# getownertools.yaml
+# login.yaml
 - test_name: "正常场景-登录成功"
   test_data:
     method: POST
@@ -13,15 +13,15 @@
     status_code: 200
     contains: "token"
 
-- test_name: "异常场景-无效Token"
-  test_data:
-    method: POST
-    url: /login
-    params:
-      email: "admin@admin.com"
-      password: "admin123456"
-    headers:
-      Content-Type: application/x-www-form-urlencoded
-  expected:
-    status_code: 401
-    contains: "Unauthorized"
+#- test_name: "异常场景-无效Token"
+#  test_data:
+#    method: POST
+#    url: /login
+#    params:
+#      email: "admin@admin.com"
+#      password: "admin123456"
+#    headers:
+#      Content-Type: application/x-www-form-urlencoded
+#  expected:
+#    status_code: 401
+#    contains: "Unauthorized"

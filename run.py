@@ -5,8 +5,8 @@ import shutil
 
 def clear_history():
     """清理历史数据"""
-    results_dir = "./log/allure-results"
-    report_dir = "./log/allure-report"
+    results_dir = "./../report/allure-results"
+    report_dir = "./../report/report/allure-report"
     if os.path.exists(results_dir):
         shutil.rmtree(results_dir)
     if os.path.exists(report_dir):
@@ -14,6 +14,6 @@ def clear_history():
 
 if __name__ == "__main__":
     clear_history()
-    pytest.main(["-s", "-v", "--alluredir=./log/allure-results"])
-    os.system("allure generate ./log/allure-results -o ./log/allure-report --clean")
-    os.system("allure open ./log/allure-report")
+    pytest.main(["-s", "-v", "--alluredir=./../report/allure-results"])
+    os.system("allure generate ./../report/allure-results -o ./../report/allure-report --clean")
+    os.system("allure open ./../report/allure-report")
