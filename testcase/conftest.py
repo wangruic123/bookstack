@@ -18,6 +18,25 @@ def global_setup():
 
 
 @pytest.fixture(scope="session")
+def token_storage(request):
+    """Session 级别的 Token 存储"""
+
+    # 创建 Token 存储对象
+    class TokenStore:
+        token = None
+
+    # 将存储对象附加到 session
+    request.session.token_store = TokenStore()
+
+    yield request.session.token_store
+
+@pytest.fixture(scope="session", autouse=True)
+def dependency_ordering(request):
+    """通过标记控制用例执行顺序"""
+    # 标记需要优先执行的用例
+    request.node.items.sort(key=lambda item: 0 if "setup" in item.name else 1)
+
+@pytest.fixture(scope="session")
 def env_config(request):
     """读取环境配置（支持命令行指定环境）"""
     # 从命令行获取环境参数，默认DEV环境

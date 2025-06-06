@@ -1,27 +1,28 @@
 # login.yaml
-- test_name: "正常场景-登录成功"
-  test_data:
-    method: POST
-    url: /login
-    params:
-      token: "123"
-      email: "admin@admin.com"
-      password: "admin123456"
-    headers:
-      Content-Type: application/x-www-form-urlencoded
+- test_name: "获取临时Token"
+  tag: setup
+  method: get
+  url: /login
+  headers:
+  data:
+  expected:
+    status_code: 200
+    extract:  # 定义需要提取的字段
+      temp_token:
+        type: regex  # 指定使用正则表达式
+        pattern: <meta\s+.*?name\s*=\s*["']token["'].*?content\s*=\s*["'](.*?)["'].*?>  # 正则表达式模式
+
+- test_name: "使用token登录"
+  tag: login
+  depends_on: "获取临时token"
+  method: POST
+  url: /login
+  data:
+    _token: "Bearer {{ temp_token }}"  # 使用提取的token
+    email: "admin@admin.com"
+    password: "admin123456"
+  headers:
+    Content-Type: application/x-www-form-urlencoded
   expected:
     status_code: 200
     contains: "token"
-
-#- test_name: "异常场景-无效Token"
-#  test_data:
-#    method: POST
-#    url: /login
-#    params:
-#      email: "admin@admin.com"
-#      password: "admin123456"
-#    headers:
-#      Content-Type: application/x-www-form-urlencoded
-#  expected:
-#    status_code: 401
-#    contains: "Unauthorized"
