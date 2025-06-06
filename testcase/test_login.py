@@ -1,27 +1,41 @@
 # testcase/test_login.py
 import pytest
 import allure
-from common.request import RequestHandler
 from common.get_caseparams import DataLoader
-from common.assertion import Assertion
+from common.request import RequestHandler
+from common.extract_utils import Extractor
+from testcase.conftest import token_storage
 
 
-@allure.feature("bookstack接口测试")
+@allure.feature("登录模块")
 class TestLogin:
-    @allure.story("登录")
-    @pytest.mark.parametrize("case", DataLoader.load_yaml("login.yaml"))
-    def test_login(self, case):
+    @pytest.mark.parametrize("case", DataLoader.load_case("login.yaml"))
+    def test_get_temp_token(self, case, token_storage):
+        """获取并存储临时Token"""
         req = RequestHandler()
-        test_data = case["test_data"]
 
-        with allure.step("1. 发送接口请求"):
-            response = req.request(
-                method=test_data["method"],
-                endpoint=test_data["url"],
-                headers=test_data.get("headers"),
-                params=test_data.get("params")
-            )
+        # 发送请求
+        response = req.request(
+            method=case["method"],
+            endpoint=case["url"],
+            json=case.get("data"),
+            headers=case.get("headers")
+        )
 
-        with allure.step("2. 验证响应结果"):
-            Assertion.assert_status_code(response, 200)
-            Assertion.assert_key_exists(response.json(), "toolList")
+        # 验证状态码
+        assert response.status_code == case["expected"]["status_code"]
+
+        # 提取并存储Token
+        extract_config = case["expected"].get("extract", {})
+        for key, config in extract_config.items():
+            value = Extractor.extract_value(response, config)
+            if value:
+                # 存储到全局Token存储
+                setattr(token_storage, key, value)
+                allure.attach(
+                    name=f"Extracted {key}",
+                    body=value,
+                    attachment_type=allure.attachment_type.TEXT
+                )
+            else:
+                pytest.fail(f"未能提取到 {key}")

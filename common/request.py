@@ -5,6 +5,50 @@ from common.log import logger
 from common.config import ConfigLoader
 
 
+class RequestContext:
+    _shared_data = {}  # 类级别共享数据
+
+    @classmethod
+    def save_data(cls, key, value):
+        cls._shared_data[key] = value
+
+    @classmethod
+    def get_data(cls, key, default=None):
+        return cls._shared_data.get(key, default)
+
+
+class RequestHandler:
+    def __init__(self):
+        self.session = requests.Session()
+        self.context = RequestContext()  # 注入上下文
+
+    def send_request(self, method, url, data=None, headers=None):
+        # 渲染动态参数（如 {{ temp_token }}）
+        rendered_headers = self._render_template(headers)
+        rendered_data = self._render_template(data)
+
+        response = self.session.request(
+            method=method,
+            url=url,
+            json=rendered_data,
+            headers=rendered_headers
+        )
+        return response
+
+    def _render_template(self, data):
+        """使用 Jinja2 模板引擎渲染动态参数"""
+        from jinja2 import Template
+        if isinstance(data, dict):
+            rendered = {}
+            for k, v in data.items():
+                if isinstance(v, str) and "{{" in v:
+                    template = Template(v)
+                    rendered[k] = template.render(self.context._shared_data)
+                else:
+                    rendered[k] = v
+            return rendered
+        return data
+
 class RequestHandler:
     def __init__(self):
         self.session = requests.Session()
